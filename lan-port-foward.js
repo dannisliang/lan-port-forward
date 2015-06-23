@@ -43,7 +43,8 @@ self.createClient = function(localPort, remotePort, remoteHost) {
 	remoteClient.on('data', function(data) {
 		if (localClient) {
 			localClient.write(data);
-		}
+		} else 
+			console.error("no localClient");
 	});
 
 	localClient = net.connect(localPort, function() {
@@ -52,6 +53,8 @@ self.createClient = function(localPort, remotePort, remoteHost) {
 	localClient.on('data', function(data) {
 		if (remoteClient) {
 			remoteClient.write(data);
+		} else {
+			console.error("no remoteClient");
 		}
 	});
 
@@ -66,9 +69,9 @@ setTimeout(function() {
 
 
 net.createServer(function(c) {
-	setInterval(function(){
-		c.write('hi!!');
-	}, 1000);
+	// setInterval(function(){
+	// 	c.write('hi!!');
+	// }, 1000);
 	c.on('data', function(data) {
 		console.log("Get from Test: " + data);
 	});
