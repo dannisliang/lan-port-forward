@@ -57,27 +57,36 @@ self.createClient = function(localPort, remotePort, remoteHost) {
 	  console.log('remoteClient disconnected from server');
 	});
 
-	localClient = net.connect(localPort, function() {
-		console.log("connect to local: " + localPort);
-	});
-	localClient.on('data', function(data) {
-		if (remoteClient) {
-			remoteClient.write(data);
-			console.log('remoteClient get: ' + data);
-		} else {
-			console.error("no remoteClient");
-		}
-	});
-	localClient.on('end', function() {
-	  console.log('localClient disconnected from server');
-	});
+	function doLocalClient() {
+		localClient = net.connect(localPort, function() {
+			console.log("connect to local: " + localPort);
+		});
+		localClient.on('data', function(data) {
+			if (remoteClient) {
+				remoteClient.write(data);
+				console.log('remoteClient get: ' + data);
+			} else {
+				console.error("no remoteClient");
+			}
+		});
+		localClient.on('error', function(err) {
+			console.error(err);
+			doLocalClient();
+		});
+		localClient.on('end', function() {
+		  console.log('localClient disconnected from server');
+		  setTimeout(doLocalClient, 1000);
+		});
+	}
+
+	doLocalClient();
 
 }
 
 // send some to 123 -> 321 ->  local 321 -> 111
 self.createServer(123, 321);
 setTimeout(function() {
-	self.createClient(888, 321, 'localhost');	
+	self.createClient(81, 321, 'localhost');	
 }, 2000);
 
 
