@@ -70,12 +70,13 @@ self.createClient = function(localPort, remotePort, remoteHost) {
 			}
 		});
 		localClient.on('error', function(err) {
-			console.error(err);
+			console.error("localClient err: " + err);
 			doLocalClient();
 		});
 		localClient.on('end', function() {
 		  console.log('localClient disconnected from server');
-		  setTimeout(doLocalClient, 1000);
+		  // setTimeout(doLocalClient, 50);
+		  doLocalClient();
 		});
 	}
 
