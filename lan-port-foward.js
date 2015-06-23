@@ -17,6 +17,9 @@ self.createServer = function(recvPort, fowardPort) {
 				console.error("Null forwardConn " + forwardConn);
 			}
 		});
+		recvConn.on('end', function() {
+		  console.log('recvConn disconnected from server');
+		});
 	}).listen(recvPort);
 
 	net.createServer(function(c) {
@@ -29,6 +32,9 @@ self.createServer = function(recvPort, fowardPort) {
 			} else {
 				console.error("Null recvConn");
 			}
+		});
+		forwardConn.on('end', function() {
+		  console.log('forwardConn disconnected from server');
 		});
 	}).listen(fowardPort);
 }
@@ -43,8 +49,12 @@ self.createClient = function(localPort, remotePort, remoteHost) {
 	remoteClient.on('data', function(data) {
 		if (localClient) {
 			localClient.write(data);
+			console.log('local client get: ' + data);
 		} else 
 			console.error("no localClient");
+	});
+	remoteClient.on('end', function() {
+	  console.log('remoteClient disconnected from server');
 	});
 
 	localClient = net.connect(localPort, function() {
@@ -53,9 +63,13 @@ self.createClient = function(localPort, remotePort, remoteHost) {
 	localClient.on('data', function(data) {
 		if (remoteClient) {
 			remoteClient.write(data);
+			console.log('remoteClient get: ' + data);
 		} else {
 			console.error("no remoteClient");
 		}
+	});
+	localClient.on('end', function() {
+	  console.log('localClient disconnected from server');
 	});
 
 }
@@ -69,10 +83,13 @@ setTimeout(function() {
 
 
 net.createServer(function(c) {
-	// setInterval(function(){
-	// 	c.write('hi!!');
-	// }, 1000);
-	c.on('data', function(data) {
-		console.log("Get from Test: " + data);
-	});
+	var i = 0;
+	setInterval(function(){
+	 	c.write('hi!!' + i.toString() + '\n');
+	 	i++;
+	}, 1000);
+	// c.on('data', function(data) {
+	// 	console.log("Get from Test: " + data);
+	// 	c.write(data);
+	// });
 }).listen(888);
